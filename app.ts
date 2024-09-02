@@ -8,14 +8,14 @@ import Hero from "@ulixee/hero-playground";
 
   const boxScore = hero.querySelector("#box-score");
   await hero.waitForElement(boxScore, {
-    timeoutMs: 10000,
+    timeoutMs: 30000,
   });
   await boxScore.click();
 
   const sectionElement = hero.querySelector('section[class^="GameBoxscore_gbTableSection"]');
   await hero.waitForElement(sectionElement, {
     waitForVisible: true,
-    timeoutMs: 10000,
+    timeoutMs: 30000,
   });
 
   const trElements = sectionElement.querySelectorAll("tr");
