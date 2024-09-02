@@ -14,7 +14,6 @@ import Hero from "@ulixee/hero-playground";
 
   const sectionElement = hero.querySelector('section[class^="GameBoxscore_gbTableSection"]');
   await hero.waitForElement(sectionElement, {
-    waitForVisible: true,
     timeoutMs: 30000,
   });
 
