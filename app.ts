@@ -43,6 +43,7 @@ import fs from "fs";
     await sectionHeaders.forEach(async (header) => {
       headerText += await header.textContent + " | ";
     });
+    console.log(headerText);
 
     const trElements = sectionElement.querySelectorAll("tr");
     console.log("Number of tr elements:", await trElements.length);
