@@ -35,6 +35,12 @@ import fs from "fs";
       timeoutMs: 30000,
     });
 
+    const sectionHeaders = sectionElement.querySelectorAll('thead[class^="StatsTableHead_thead"] > tr > th');
+    let headerText = "";
+    await sectionHeaders.forEach(async (header) => {
+      headerText += await header.textContent + " | ";
+    });
+
     const trElements = sectionElement.querySelectorAll("tr");
     console.log("Number of tr elements:", await trElements.length);
 
