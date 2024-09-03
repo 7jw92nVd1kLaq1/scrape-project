@@ -36,6 +36,9 @@ import fs from "fs";
     });
 
     const sectionHeaders = sectionElement.querySelectorAll('thead[class^="StatsTableHead_thead"] > tr > th');
+    await hero.waitForElement(sectionHeaders[0], {
+      timeoutMs: 30000,
+    });
     let headerText = "";
     await sectionHeaders.forEach(async (header) => {
       headerText += await header.textContent + " | ";
