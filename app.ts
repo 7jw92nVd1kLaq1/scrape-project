@@ -1,5 +1,50 @@
-import Hero from "@ulixee/hero-playground";
+import Hero, { ISuperNode } from "@ulixee/hero-playground";
 import fs from "fs";
+
+
+interface IPlayerStats {
+  [key: string]: string;
+}
+
+
+const extractPlayerName = async (playerElement: ISuperNode) => {
+  const playerNameElement = playerElement.querySelector("span[class^='GameBoxscoreTablePlayer_gbpNameFull']");
+  const playerName = await playerNameElement.textContent || "";
+  return playerName;
+};
+
+const extractPlayerStats = async (playerElement: ISuperNode) => {
+  const statsHeader = ["min", "fgm", "fga", "fg%", "3pm", "3pa", "3p%", "ftm", "fta", "ft%", "oreb", "dreb", "reb", "ast", "stl", "blk", "to", "pf", "pts", "+/-"];
+  const stats : IPlayerStats = {
+    min: "",
+    fgm: "",
+    fga: "",
+    'fg%': "",
+    '3pm': "",
+    '3pa': "",
+    '3p%': "",
+    ftm: "",
+    fta: "",
+    'ft%': "",
+    oreb: "",
+    dreb: "",
+    reb: "",
+    ast: "",
+    stl: "",
+    blk: "",
+    to: "",
+    pf: "",
+    pts: "",
+    '+/-': "",
+  };
+
+  const playerStats = playerElement.querySelectorAll("td[class^='GameBoxscoreTable_stat']");
+  await playerStats.forEach(async (statElement, index) => {
+    stats[statsHeader[index]] = await statElement.textContent || "";
+  });
+
+  return stats;
+};
 
 (async () => {
   const hero = new Hero({
@@ -49,12 +94,13 @@ import fs from "fs";
     console.log("Number of tr elements:", await trElements.length);
 
     await trElements.forEach(async (trElement) => {
-      const tdElements = trElement.querySelectorAll("td");
-      let rowText = "";
-      await tdElements.forEach(async (tdElement) => {
-        rowText += await tdElement.textContent + " | ";
-      });
-      console.log(rowText);
+      const playerName = await extractPlayerName(trElement);
+      if (!playerName) {
+        return;
+      }
+      const playerStats = await extractPlayerStats(trElement);
+      playerStats.playerName = playerName;
+      console.log(playerStats);
     });
     fs.writeFileSync("box-score.html", await hero.document.documentElement.outerHTML);
   } catch (error) {
