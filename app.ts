@@ -17,6 +17,9 @@ import fs from "fs";
     console.log("Title:", title);
 
     const consentButton = hero.querySelector('body > div.fc-consent-root > div.fc-dialog-container > div.fc-dialog.fc-choice-dialog > div.fc-footer-buttons-container > div.fc-footer-buttons > button.fc-button.fc-cta-consent.fc-primary-button');
+    await hero.waitForElement(consentButton, {
+      timeoutMs: 30000,
+    });
     if (consentButton) {
       await consentButton.click();
     }
