@@ -7,6 +7,7 @@ import fs from "fs";
       'BlockCssResources',
       'BlockFonts',
       'BlockImages',
+      'BlockMedia',
     ]
   });
 
@@ -14,6 +15,11 @@ import fs from "fs";
     await hero.goto("https://www.nba.com/game/atl-vs-chi-1522400055/game-charts");
     const title = await hero.document.title;
     console.log("Title:", title);
+
+    const consentButton = hero.querySelector('body > div.fc-consent-root > div.fc-dialog-container > div.fc-dialog.fc-choice-dialog > div.fc-footer-buttons-container > div.fc-footer-buttons > button.fc-button.fc-cta-consent.fc-primary-button');
+    if (consentButton) {
+      await consentButton.click();
+    }
 
     const boxScore = hero.querySelector("#box-score");
     await hero.waitForElement(boxScore, {
