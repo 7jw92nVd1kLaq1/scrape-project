@@ -1,4 +1,5 @@
 import Hero, { ISuperNode, Tab } from "@ulixee/hero-playground";
+import { Session } from '@ulixee/hero-core';
 import fs from "fs";
 
 
@@ -22,6 +23,11 @@ interface IPlayerStats {
 interface IPlayerGameStats {
   [key: string]: string;
 }
+
+type IDeleteSession = {
+  id: string;
+  databasePath: string;
+} | undefined;
 
 const extractAllTeamsUrl = async () => {
   const hero = new Hero();
@@ -123,10 +129,27 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
   }
 }
 
+function sessionCloseCallback(deleteSession: IDeleteSession) {
+  if (!deleteSession) return;
+  // NOTE: determine if database should be kept (track session ids vs errors on your own)
+  fs.unlink(deleteSession.databasePath, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(`Deleted session ${deleteSession.id} database`);
+  });
+}
+
+Session.events.on('closed', sessionCloseCallback);
+
 (async () => {
   const teams = await extractAllTeamsUrl();
 
   for (const team of teams) {
+    if (team.teamName === "Los Angeles Lakers") {
+      break;
+    }
     const hero = new Hero();
 
     const newTab = await hero.newTab();
