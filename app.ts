@@ -35,6 +35,7 @@ const extractGameInfoFromTab = async (tab: Tab, url: string) => {
     // replace all spaces with underscores
     title = title.replace(/\s/g, "_");
 
+    // Create a flow handler to handle the consent dialog automatically at any point in time
     await tab.registerFlowHandler("Consent", assert => {
       assert(tab.querySelector('body > div.fc-consent-root > div.fc-dialog-container > div.fc-dialog.fc-choice-dialog > div.fc-footer-buttons-container > div.fc-footer-buttons > button.fc-button.fc-cta-consent.fc-primary-button').$exists)
     },
