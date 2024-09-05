@@ -23,7 +23,10 @@ interface IPlayerGameStats {
   [key: string]: string;
 }
 
-const extractAllTeamsUrl = async (tab: Tab) => {
+const extractAllTeamsUrl = async () => {
+  const hero = new Hero();
+  const tab = await hero.newTab();
+
   try {
     await tab.goto("https://www.basketball-reference.com/teams/");
     console.log(await tab.document.title);
@@ -44,6 +47,8 @@ const extractAllTeamsUrl = async (tab: Tab) => {
   } catch (error) {
     console.error(error);
     throw new Error("Error extracting all teams");
+  } finally {
+    await hero.close();
   }
 };
 
@@ -119,12 +124,12 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
 }
 
 (async () => {
-  const hero = new Hero();
-
-  const newTab = await hero.newTab();
-  const teams = await extractAllTeamsUrl(newTab);
+  const teams = await extractAllTeamsUrl();
 
   for (const team of teams) {
+    const hero = new Hero();
+
+    const newTab = await hero.newTab();
     const seasonUrl = await extractLatestSeasonUrl(newTab, team.url);
     await newTab.waitForMillis(3000);
     const playerUrls = await extractPlayers(newTab, seasonUrl);
@@ -138,8 +143,9 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
       player.annualStats = careerStats;
       console.log(`Extracted career stats for ${player.playerName}`);
     }
+
+    await hero.close();
   }
 
   fs.writeFileSync("teams.json", JSON.stringify(teams, null, 2));
-  await hero.close();
 })();
