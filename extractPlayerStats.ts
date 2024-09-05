@@ -31,13 +31,12 @@ type IDeleteSession = {
 
 const extractAllTeamsUrl = async () => {
   const hero = new Hero();
-  const tab = await hero.newTab();
 
   try {
-    await tab.goto("https://www.basketball-reference.com/teams/");
-    console.log(await tab.document.title);
+    await hero.goto("https://www.basketball-reference.com/teams/");
+    console.log(await hero.document.title);
 
-    const teamTables = tab.querySelectorAll("#teams_active > tbody > tr > th > a");
+    const teamTables = hero.querySelectorAll("#teams_active > tbody > tr > th > a");
     const teamUrls : ITeamInfo[] = [];
 
     await teamTables.forEach(async (team) => {
@@ -54,16 +53,18 @@ const extractAllTeamsUrl = async () => {
     console.error(error);
     throw new Error("Error extracting all teams");
   } finally {
+    await hero.waitForMillis(3000);
     await hero.close();
   }
 };
 
-const extractLatestSeasonUrl = async (tab: Tab, url: string) => {
+const extractLatestSeasonUrl = async (url: string) => {
+  const hero = new Hero();
   try {
-    await tab.goto(url);
+    await hero.goto(url);
 
-    const seasonRow = tab.querySelector("tbody > tr[data-row='0'] > th > a");
-    await tab.waitForElement(seasonRow, {
+    const seasonRow = hero.querySelector("tbody > tr[data-row='0'] > th > a");
+    await hero.waitForElement(seasonRow, {
       timeoutMs: 5000,
     });
 
@@ -73,14 +74,18 @@ const extractLatestSeasonUrl = async (tab: Tab, url: string) => {
   } catch (error) {
     console.error(error);
     throw new Error("Error extracting latest season");
+  } finally {
+    await hero.waitForMillis(3000);
+    await hero.close();
   }
 }
 
-const extractPlayers = async (tab: Tab, url: string) => {
+const extractPlayers = async (url: string) => {
+  const hero = new Hero();
   try {
-    await tab.goto(url);
+    await hero.goto(url);
 
-    const playerTables = tab.querySelectorAll("#roster > tbody > tr > td[data-stat='player'] > a");
+    const playerTables = hero.querySelectorAll("#roster > tbody > tr > td[data-stat='player'] > a");
     const playerUrls : IPlayerInfo[] = [];
 
     await playerTables.forEach(async (player) => {
@@ -95,21 +100,25 @@ const extractPlayers = async (tab: Tab, url: string) => {
   } catch (error) {
     console.error(error);
     throw new Error("Error extracting all players");
+  } finally {
+    await hero.waitForMillis(3000);
+    await hero.close();
   }
 };
 
-const extractPlayerCareerStats = async (tab: Tab, url: string) => {
+const extractPlayerCareerStats = async (url: string) => {
+  const hero = new Hero();
   try {
-    await tab.goto(url);
+    await hero.goto(url);
 
-    const statHeaders = tab.querySelectorAll("#per_game > thead > tr > th");
+    const statHeaders = hero.querySelectorAll("#per_game > thead > tr > th");
     const headers : string[] = [];
     await statHeaders.forEach(async (header) => {
       const headerText = await header.innerText;
       headers.push(headerText);
     });
 
-    const careerStats = tab.querySelectorAll("#per_game > tbody > tr");
+    const careerStats = hero.querySelectorAll("#per_game > tbody > tr");
     const playerStats : IPlayerStats[] = [];
     await careerStats.forEach(async (stat, index) => {
       const yearlyStats : IPlayerStats = {};
@@ -126,6 +135,9 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
   } catch (error) {
     console.error(error);
     throw new Error("Error extracting player career stats");
+  } finally {
+    await hero.waitForMillis(3000);
+    await hero.close();
   }
 }
 
@@ -147,27 +159,16 @@ Session.events.on('closed', sessionCloseCallback);
   const teams = await extractAllTeamsUrl();
 
   for (const team of teams) {
-    if (team.teamName === "Los Angeles Lakers") {
-      break;
-    }
-    const hero = new Hero();
-
-    const newTab = await hero.newTab();
-    const seasonUrl = await extractLatestSeasonUrl(newTab, team.url);
-    await newTab.waitForMillis(3000);
-    const playerUrls = await extractPlayers(newTab, seasonUrl);
-    await newTab.waitForMillis(3000);
+    const seasonUrl = await extractLatestSeasonUrl(team.url);
+    const playerUrls = await extractPlayers(seasonUrl);
     team.players = playerUrls;
     console.log(`Extracted players for ${team.teamName}`);
 
     for (const player of team.players) {
-      const careerStats = await extractPlayerCareerStats(newTab, player.playerUrl);
-      await newTab.waitForMillis(3000);
+      const careerStats = await extractPlayerCareerStats(player.playerUrl);
       player.annualStats = careerStats;
       console.log(`Extracted career stats for ${player.playerName}`);
     }
-
-    await hero.close();
   }
 
   fs.writeFileSync("teams.json", JSON.stringify(teams, null, 2));
