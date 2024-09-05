@@ -125,13 +125,13 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
   const teams = await extractAllTeamsUrl(newTab);
 
   for (const team of teams) {
-    const newTab = await hero.newTab();
     const seasonUrl = await extractLatestSeasonUrl(newTab, team.url);
     await newTab.waitForMillis(3000);
     const playerUrls = await extractPlayers(newTab, seasonUrl);
     await newTab.waitForMillis(3000);
     team.players = playerUrls;
     console.log(`Extracted players for ${team.teamName}`);
+
     for (const player of team.players) {
       const careerStats = await extractPlayerCareerStats(newTab, player.playerUrl);
       await newTab.waitForMillis(3000);
