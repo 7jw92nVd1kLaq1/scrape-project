@@ -158,7 +158,8 @@ Session.events.on('closed', sessionCloseCallback);
 (async () => {
   const teams = await extractAllTeamsUrl();
 
-  for (const team of teams) {
+  while (teams.length > 0) {
+    const team = teams[0];
     const seasonUrl = await extractLatestSeasonUrl(team.url);
     const playerUrls = await extractPlayers(seasonUrl);
     team.players = playerUrls;
@@ -169,7 +170,10 @@ Session.events.on('closed', sessionCloseCallback);
       player.annualStats = careerStats;
       console.log(`Extracted career stats for ${player.playerName}`);
     }
-  }
 
-  fs.writeFileSync("teams.json", JSON.stringify(teams, null, 2));
+    fs.writeFileSync(`${team.teamName}.json`, JSON.stringify(team, null, 2));
+
+    // delete the first item in a list
+    teams.shift();
+  }
 })();
