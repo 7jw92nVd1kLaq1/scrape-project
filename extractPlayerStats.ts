@@ -53,7 +53,7 @@ const extractAllTeamsUrl = async () => {
     console.error(error);
     throw new Error("Error extracting all teams");
   } finally {
-    await hero.waitForMillis(3000);
+    await hero.waitForMillis(2000);
     await hero.close();
   }
 };
@@ -75,7 +75,7 @@ const extractLatestSeasonUrl = async (url: string) => {
     console.error(error);
     throw new Error("Error extracting latest season");
   } finally {
-    await hero.waitForMillis(3000);
+    await hero.waitForMillis(2000);
     await hero.close();
   }
 }
@@ -101,7 +101,7 @@ const extractPlayers = async (url: string) => {
     console.error(error);
     throw new Error("Error extracting all players");
   } finally {
-    await hero.waitForMillis(3000);
+    await hero.waitForMillis(2000);
     await hero.close();
   }
 };
@@ -136,7 +136,7 @@ const extractPlayerCareerStats = async (url: string) => {
     console.error(error);
     throw new Error("Error extracting player career stats");
   } finally {
-    await hero.waitForMillis(3000);
+    await hero.waitForMillis(2000);
     await hero.close();
   }
 }
