@@ -138,7 +138,6 @@ const extractPlayerCareerStats = async (tab: Tab, url: string) => {
       player.annualStats = careerStats;
       console.log(`Extracted career stats for ${player.playerName}`);
     }
-    await newTab.close();
   }
 
   fs.writeFileSync("teams.json", JSON.stringify(teams, null, 2));
